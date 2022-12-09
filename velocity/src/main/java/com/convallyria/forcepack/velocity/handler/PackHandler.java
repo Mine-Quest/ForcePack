@@ -30,6 +30,11 @@ public final class PackHandler {
         return applying;
     }
 
+    public void unloadPack(Player player) {
+        if (player.getAppliedResourcePack() == null) return;
+        plugin.getPackByServer(ForcePackVelocity.EMPTY_SERVER_NAME).ifPresent(empty -> empty.setResourcePack(player.getUniqueId()));
+    }
+
     public void setPack(final Player player, final ServerInfo serverInfo) {
         plugin.getPackByServer(serverInfo.getName()).ifPresentOrElse(resourcePack -> {
             final int protocol = player.getProtocolVersion().getProtocol();

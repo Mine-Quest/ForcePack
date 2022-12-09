@@ -6,6 +6,7 @@ import com.convallyria.forcepack.api.utils.ClientVersion;
 import com.convallyria.forcepack.api.utils.HashingUtil;
 import com.convallyria.forcepack.api.verification.ResourcePackURLData;
 import com.convallyria.forcepack.velocity.command.ForcePackCommand;
+import com.convallyria.forcepack.velocity.command.ForcePackUnloadCommand;
 import com.convallyria.forcepack.velocity.config.VelocityConfig;
 import com.convallyria.forcepack.velocity.handler.PackHandler;
 import com.convallyria.forcepack.velocity.listener.ResourcePackListener;
@@ -119,6 +120,9 @@ public class ForcePackVelocity implements ForcePackAPI {
     private void registerCommands() {
         CommandMeta meta = commandManager.metaBuilder("forcepackreload").build();
         commandManager.register(meta, new ForcePackCommand(this));
+
+        CommandMeta unloadMeta = commandManager.metaBuilder("forcepackunload").build();
+        commandManager.register(unloadMeta, new ForcePackUnloadCommand(this));
     }
 
     public void loadResourcePacks() {
