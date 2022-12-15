@@ -49,7 +49,8 @@ public final class PackHandler {
             final ResourcePackInfo appliedResourcePack = player.getAppliedResourcePack();
             final boolean forceApply = plugin.getConfig().getBoolean("force-constant-download", false);
             if (appliedResourcePack != null && !forceApply) {
-                if (Arrays.equals(appliedResourcePack.getHash(), resourcePack.getHashSum())) {
+                if (Arrays.equals(appliedResourcePack.getHash(), resourcePack.getHashSum())
+                        && !applying.contains(player.getUniqueId())) /*Also check for if we're still attempting to apply it to them*/ {
                     plugin.log("Not applying already applied pack to player " + player.getUsername() + ".");
                     return;
                 }
