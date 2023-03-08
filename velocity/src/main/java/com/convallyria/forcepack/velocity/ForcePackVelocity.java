@@ -20,6 +20,7 @@ import com.velocitypowered.api.event.command.CommandExecuteEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
+import com.velocitypowered.api.proxy.ConsoleCommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import net.kyori.adventure.text.Component;
@@ -43,7 +44,7 @@ import java.util.function.Consumer;
 @Plugin(
         id = "forcepack",
         name = "ForcePack",
-        version = "1.2.6",
+        version = "1.2.8",
         description = "Force players to use your server resource pack.",
         url = "https://www.convallyria.com",
         authors = {"SamB440"}
@@ -76,9 +77,9 @@ public class ForcePackVelocity implements ForcePackAPI {
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
         getLogger().info("Enabling ForcePack (velocity)...");
-        this.createConfig();
+        this.reloadConfig();
         this.packHandler = new PackHandler(this);
-        this.loadResourcePacks();
+        this.loadResourcePacks(null);
         this.registerListeners();
         this.registerCommands();
         metricsFactory.make(this, 13678);
@@ -96,6 +97,10 @@ public class ForcePackVelocity implements ForcePackAPI {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void reloadConfig() {
+        this.createConfig();
         this.config = new VelocityConfig(this);
     }
 
@@ -125,7 +130,7 @@ public class ForcePackVelocity implements ForcePackAPI {
         commandManager.register(unloadMeta, new ForcePackUnloadCommand(this));
     }
 
-    public void loadResourcePacks() {
+    public void loadResourcePacks(@Nullable Player player) {
         resourcePacks.clear(); // Clear for reloads
 
         this.checkUnload();
@@ -133,6 +138,7 @@ public class ForcePackVelocity implements ForcePackAPI {
 
         final boolean verifyPacks = getConfig().getBoolean("verify-resource-packs");
         final VelocityConfig servers = getConfig().getConfig("servers");
+        final ConsoleCommandSource consoleSender = this.getServer().getConsoleCommandSource();
         for (String serverName : servers.getKeys()) {
             final VelocityConfig serverConfig = servers.getConfig(serverName);
             final VelocityConfig resourcePack = serverConfig.getConfig("resourcepack");
@@ -182,7 +188,9 @@ public class ForcePackVelocity implements ForcePackAPI {
                         this.getLogger().error("-----------------------------------------------");
                         return;
                     } else {
-                        server.sendMessage(Component.text("Hash verification complete for server " + serverName + ".").color(NamedTextColor.GREEN));
+                        Component hashMsg = Component.text("Hash verification complete for server " + serverName + ".").color(NamedTextColor.GREEN);
+                        consoleSender.sendMessage(hashMsg);
+                        if (player != null) player.sendMessage(hashMsg);
                     }
                 } catch (Exception e) {
                     this.getLogger().error("Please provide a correct SHA-1 hash/url!");
@@ -198,7 +206,9 @@ public class ForcePackVelocity implements ForcePackAPI {
             return;
         }
 
-        server.sendMessage(Component.text("Loaded " + resourcePacks.size() + " verified resource packs.").color(NamedTextColor.GREEN));
+        Component loadedMsg = Component.text("Loaded " + resourcePacks.size() + " verified resource packs.").color(NamedTextColor.GREEN);
+        consoleSender.sendMessage(loadedMsg);
+        if (player != null) player.sendMessage(loadedMsg);
     }
 
     private void checkUnload() {
@@ -250,7 +260,7 @@ public class ForcePackVelocity implements ForcePackAPI {
     }
 
     private void checkForRehost(String url, String section) {
-        List<String> warnForHost = Arrays.asList("convallyria.com");
+        List<String> warnForHost = List.of("convallyria.com");
         boolean rehosted = true;
         for (String host : warnForHost) {
             if (url.contains(host)) {

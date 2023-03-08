@@ -10,7 +10,7 @@ dependencies {
 
 allprojects {
     group = "com.convallyria.forcepack"
-    version = "1.2.6"
+    version = "1.2.8"
 
     apply(plugin = "com.github.johnrengelman.shadow")
     apply(plugin = "java")
@@ -31,7 +31,7 @@ allprojects {
         }
         maven {
             name = "papermc"
-            url = uri("https://papermc.io/repo/repository/maven-public/")
+            url = uri("https://repo.papermc.io/repository/maven-public/")
         }
         maven {
             name = "sonatype"
