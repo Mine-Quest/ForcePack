@@ -114,8 +114,8 @@ public class ResourcePackListener {
                 return disconnectAction(player, actions);
             }
 
-            long time = now - sentAccept.remove(player.getUniqueId());
-            if (time <= 10) {
+            long time = (now - sentAccept.remove(player.getUniqueId())) - player.getPing();
+            if (time <= 250L) {
                 plugin.log("Kicked player " + player.getUsername() + " because they are sending fake resource pack statuses (sent too fast).");
                 final VelocityConfig actions = actionsRoot.getConfig("FAILED_DOWNLOAD");
                 return disconnectAction(player, actions);

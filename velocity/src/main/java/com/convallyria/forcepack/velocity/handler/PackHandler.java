@@ -33,6 +33,11 @@ public final class PackHandler {
         return applying;
     }
 
+    public void unloadPack(Player player) {
+        if (player.getAppliedResourcePack() == null) return;
+        plugin.getPackByServer(ForcePackVelocity.EMPTY_SERVER_NAME).ifPresent(empty -> empty.setResourcePack(player.getUniqueId()));
+    }
+
     public void setPack(final Player player, final ServerConnection server) {
         // Find whether the config contains this server
         final ServerInfo serverInfo = server.getServerInfo();
@@ -63,8 +68,11 @@ public final class PackHandler {
             AtomicReference<ScheduledTask> task = new AtomicReference<>();
             final Scheduler.TaskBuilder builder = plugin.getServer().getScheduler().buildTask(plugin, () -> {
                 if (player.getAppliedResourcePack() != null) {
+                    plugin.getLogger().info(String.format("player %s already has a pack applied!", player.getUsername()));
                     // Check the pack they have applied now is the one we're looking for.
                     if (Arrays.equals(player.getAppliedResourcePack().getHash(), resourcePack.getHashSum())) {
+                        plugin.getLogger().info(Arrays.toString(player.getAppliedResourcePack().getHash()));
+                        plugin.getLogger().info(Arrays.toString(resourcePack.getHashSum()));
                        if (task.get() != null) task.get().cancel();
                     }
                 }
