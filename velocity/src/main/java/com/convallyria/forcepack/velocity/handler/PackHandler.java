@@ -74,6 +74,7 @@ public final class PackHandler {
                         plugin.getLogger().info(Arrays.toString(player.getAppliedResourcePack().getHash()));
                         plugin.getLogger().info(Arrays.toString(resourcePack.getHashSum()));
                        if (task.get() != null) task.get().cancel();
+                       return;
                     }
                 }
                 plugin.log("Applying ResourcePack to " + player.getUsername() + ".");
